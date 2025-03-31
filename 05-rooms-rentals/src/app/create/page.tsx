@@ -20,19 +20,17 @@ async function onSubmit(prevState: ApiResponse<Room> | undefined, formData: Form
     const heroUrl = formData.get("heroUrl")?.toString() || ""
     const price = formData.get("price")?.toString() || ""
 
-
     if (!title || !description || !heroUrl || !price) {
-      return { status: 400, statusText: "Alle Felder sind erforderlich", data: undefined }
+      return { status: 400, statusText: "All fields are required", data: undefined }
     }
 
-  
     try {
       const url = new URL(heroUrl)
       if (!url.hostname.includes("pxhere.com")) {
-        return { status: 400, statusText: "Bild-URL muss von pxhere.com sein", data: undefined }
+        return { status: 400, statusText: "Image URL must be from pxhere.com", data: undefined }
       }
     } catch (e) {
-      return { status: 400, statusText: "Ungültiges URL-Format", data: undefined }
+      return { status: 400, statusText: "Invalid URL format", data: undefined }
     }
 
     const roomInput: RoomInput = {
@@ -48,23 +46,13 @@ async function onSubmit(prevState: ApiResponse<Room> | undefined, formData: Form
     const response = await ApiService.post<Room>(`${API_URL}/rooms`, roomInput)
 
     if (response.status === 201) {
-      revalidatePath("/rooms"); // Sicherstellen, dass die Seite aktualisiert wird
-      return response; // Rückgabe der Antwort
+      revalidatePath("/rooms");
+      return response;
     }
 
     return response;
   } catch (error) {
     console.error("Error creating room:", error);
-    return { status: 500, statusText: "Ein Fehler ist aufgetreten", data: undefined };
+    return { status: 500, statusText: "An error occurred", data: undefined };
   }
-}
-
-
-export default function CreateCabinPage() {
-  return (
-    <div className="py-8">
-      <h2 className="text-2xl font-bold mb-6">Create New Cabin</h2>
-      <RegisterForm<Room> action={onSubmit} />
-    </div>
-  )
 }

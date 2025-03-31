@@ -24,8 +24,6 @@ export default function FormItems({ errors = {} }: FormItemsProps) {
         />
         {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
       </div>
-
-      {/* Repeat similar structure for other fields */}
       <div>
         <label htmlFor="description" className="block">
           Description

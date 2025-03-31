@@ -14,11 +14,10 @@ export default function RoomsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Get params safely
   const pageParam = searchParams.get('page')
   const sortParam = searchParams.get('sort')
 
-  // Initialize state from URL params
+ 
   useEffect(() => {
     if (pageParam) {
       const page = Number(pageParam)
@@ -32,7 +31,7 @@ export default function RoomsPage() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const pageIndex = currentPage - 1; // 0-based für Backend
+        const pageIndex = currentPage - 1; 
         const sortValue = sortParam || 'createdAt';
         
         const apiUrl = new URL(`${API_URL}/rooms`);
