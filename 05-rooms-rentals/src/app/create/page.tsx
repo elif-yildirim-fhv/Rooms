@@ -20,12 +20,12 @@ async function onSubmit(prevState: ApiResponse<Room> | undefined, formData: Form
     const heroUrl = formData.get("heroUrl")?.toString() || ""
     const price = formData.get("price")?.toString() || ""
 
-    // Server-seitige Validierung
+
     if (!title || !description || !heroUrl || !price) {
       return { status: 400, statusText: "Alle Felder sind erforderlich", data: undefined }
     }
 
-    // URL-Validierung
+  
     try {
       const url = new URL(heroUrl)
       if (!url.hostname.includes("pxhere.com")) {
@@ -48,14 +48,14 @@ async function onSubmit(prevState: ApiResponse<Room> | undefined, formData: Form
     const response = await ApiService.post<Room>(`${API_URL}/rooms`, roomInput)
 
     if (response.status === 201) {
-      revalidatePath("/rooms")
-      // **redirect("/rooms") ENTFERNEN**, da der Client es übernimmt
+      revalidatePath("/rooms"); // Sicherstellen, dass die Seite aktualisiert wird
+      return response; // Rückgabe der Antwort
     }
 
-    return response
+    return response;
   } catch (error) {
-    console.error("Error creating room:", error)
-    return { status: 500, statusText: "Ein Fehler ist aufgetreten", data: undefined }
+    console.error("Error creating room:", error);
+    return { status: 500, statusText: "Ein Fehler ist aufgetreten", data: undefined };
   }
 }
 

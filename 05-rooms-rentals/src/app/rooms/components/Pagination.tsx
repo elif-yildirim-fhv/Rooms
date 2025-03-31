@@ -1,3 +1,4 @@
+// Pagination.tsx
 "use client"
 import { useRouter, useSearchParams } from "next/navigation"
 
@@ -5,12 +6,12 @@ export default function Pagination({
   currentPage,
   totalPages,
   setPage,
-  sortKey,
+  currentSort, // Hier die currentSort-Eigenschaft hinzufügen
 }: {
   currentPage: number
   totalPages: number
   setPage: (page: number) => void
-  sortKey: string
+  currentSort: string // Hier den Typ für currentSort definieren
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -21,7 +22,7 @@ export default function Pagination({
     // URL aktualisieren
     const params = new URLSearchParams(searchParams.toString())
     params.set('page', page.toString())
-    params.set('sort', sortKey)
+    params.set('sort', currentSort) // Hier currentSort verwenden
     router.push(`/rooms?${params.toString()}`, { scroll: false })
   }
 

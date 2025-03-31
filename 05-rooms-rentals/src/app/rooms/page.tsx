@@ -28,41 +28,36 @@ export default function RoomsPage() {
     }
   }, [pageParam])
 
-  // Fetch data when params change
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-        const pageIndex = currentPage - 1 // 0-based for backend
-        const sortValue = sortParam || 'createdAt'
+        const pageIndex = currentPage - 1; // 0-based für Backend
+        const sortValue = sortParam || 'createdAt';
         
-        const apiUrl = new URL(`${API_URL}/rooms`)
-        apiUrl.searchParams.set('size', '9')
-        apiUrl.searchParams.set('page', pageIndex.toString())
-        apiUrl.searchParams.set('sort', sortValue)
-
-        console.log('Fetching from:', apiUrl.toString()) // Debug
-
-        const response = await fetch(apiUrl.toString(), { 
-          next: { revalidate: 60 } 
-        })
-
+        const apiUrl = new URL(`${API_URL}/rooms`);
+        apiUrl.searchParams.set('size', '9');
+        apiUrl.searchParams.set('page', pageIndex.toString());
+        apiUrl.searchParams.set('sort', sortValue);
+  
+        const response = await fetch(apiUrl.toString(), { next: { revalidate: 60 } });
+  
         if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.status}`)
+          throw new Error(`Failed to fetch: ${response.status}`);
         }
-
-        const result = await response.json()
-        setData(result)
+  
+        const result = await response.json();
+        setData(result);
       } catch (err) {
-        console.error('Fetch error:', err)
-        setError(err instanceof Error ? err.message : "Unknown error")
+        console.error('Fetch error:', err);
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-
-    fetchData()
-  }, [currentPage, sortParam])
+    };
+  
+    fetchData();
+  }, [currentPage, sortParam]);
 
   if (isLoading) return (
     <div className="container mx-auto px-4 py-8">
