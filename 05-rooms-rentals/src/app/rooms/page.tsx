@@ -5,29 +5,47 @@ import Pagination from "./components/Pagination"
 import SortControls from "./components/SortControls"
 import type { Room, PageInfo } from "@/types"
 import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 
-export default function RoomsPage({
-  searchParams,
-}: {
-  searchParams: { page?: string; sort?: string }
-}) {
-  const [currentPage, setCurrentPage] = useState(Number(searchParams.page) || 1);
-  const [sortKey, setSortKey] = useState(searchParams.sort || "newest");
-  const [data, setData] = useState<{ page: PageInfo; nodes: Room[] } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default function RoomsPage() {
+  const searchParams = useSearchParams()
+  const [currentPage, setCurrentPage] = useState(1)
+  const [data, setData] = useState<{ page: PageInfo; nodes: Room[] } | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
+  // Get params safely
+  const pageParam = searchParams.get('page')
+  const sortParam = searchParams.get('sort')
+
+  // Initialize state from URL params
+  useEffect(() => {
+    if (pageParam) {
+      const page = Number(pageParam)
+      if (!isNaN(page) && page > 0) {
+        setCurrentPage(page)
+      }
+    }
+  }, [pageParam])
+
+  // Fetch data when params change
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true)
       try {
-        const pageIndex = currentPage - 1
-        const sortParam = getSortParam(sortKey)
+        const pageIndex = currentPage - 1 // 0-based for backend
+        const sortValue = sortParam || 'createdAt'
         
-        const response = await fetch(
-          `${API_URL}/rooms?size=9&page=${pageIndex}&sort=${sortParam}`,
-          { next: { revalidate: 60 } }
-        )
+        const apiUrl = new URL(`${API_URL}/rooms`)
+        apiUrl.searchParams.set('size', '9')
+        apiUrl.searchParams.set('page', pageIndex.toString())
+        apiUrl.searchParams.set('sort', sortValue)
+
+        console.log('Fetching from:', apiUrl.toString()) // Debug
+
+        const response = await fetch(apiUrl.toString(), { 
+          next: { revalidate: 60 } 
+        })
 
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${response.status}`)
@@ -36,6 +54,7 @@ export default function RoomsPage({
         const result = await response.json()
         setData(result)
       } catch (err) {
+        console.error('Fetch error:', err)
         setError(err instanceof Error ? err.message : "Unknown error")
       } finally {
         setIsLoading(false)
@@ -43,36 +62,41 @@ export default function RoomsPage({
     }
 
     fetchData()
-  }, [currentPage, sortKey])
+  }, [currentPage, sortParam])
 
-  const getSortParam = (sortKey: string) => {
-    switch (sortKey) {
-      case "price": return "price,asc"
-      case "name": return "name,asc"
-      case "newest":
-      default: return "createdAt,desc"
-    }
-  }
+  if (isLoading) return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-center items-center h-64">
+        <p className="text-gray-500">Loading rooms...</p>
+      </div>
+    </div>
+  )
 
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Error: {error}</div>
-  if (!data) return <div>No data found</div>
+  if (error) return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="text-red-500 p-4 border border-red-200 rounded bg-red-50">
+        Error: {error}
+      </div>
+    </div>
+  )
+
+  if (!data) return (
+    <div className="container mx-auto px-4 py-8">
+      <p className="text-gray-500">No room data available</p>
+    </div>
+  )
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Available Rooms</h1>
+      <h1 className="text-3xl font-bold mb-6">Available Rooms</h1>
 
-      <div className="mb-4">
-        <p>
+      <div className="flex justify-between items-center mb-6">
+        <p className="text-sm text-gray-600">
           Showing {data.nodes.length} of {data.page.totalElements} rooms
         </p>
+        
+        <SortControls currentSort={sortParam || 'createdAt'} />
       </div>
-
-      <SortControls 
-        initialSort={sortKey}
-        setSort={setSortKey}
-        setPage={setCurrentPage}
-      />
 
       {data.nodes.length > 0 ? (
         <>
@@ -81,13 +105,13 @@ export default function RoomsPage({
             currentPage={currentPage}
             totalPages={data.page.totalPages}
             setPage={setCurrentPage}
-            sortKey={sortKey}
+            currentSort={sortParam || 'createdAt'}
           />
         </>
       ) : (
-        <div className="text-center py-8">
+        <div className="text-center py-12">
           <p className="text-lg text-gray-500">
-            No rooms found. Try a different filter or create a new room.
+            No rooms found. Try adjusting your filters.
           </p>
         </div>
       )}

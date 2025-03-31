@@ -2,7 +2,11 @@
 import { useFormStatus } from "react-dom"
 import Input from "./Input"
 
-export default function FormItems({ errors = {} }: { errors?: Record<string, string> }) {
+interface FormItemsProps {
+  errors?: Record<string, string>
+}
+
+export default function FormItems({ errors = {} }: FormItemsProps) {
   const { pending } = useFormStatus()
 
   return (
@@ -21,6 +25,7 @@ export default function FormItems({ errors = {} }: { errors?: Record<string, str
         {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
       </div>
 
+      {/* Repeat similar structure for other fields */}
       <div>
         <label htmlFor="description" className="block">
           Description
@@ -65,4 +70,3 @@ export default function FormItems({ errors = {} }: { errors?: Record<string, str
     </div>
   )
 }
-

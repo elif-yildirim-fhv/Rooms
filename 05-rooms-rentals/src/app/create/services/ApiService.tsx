@@ -7,7 +7,7 @@ export type ApiResponse<Data = unknown> = {
 };
 
 export default class ApiService {
-  static async fetch(pathname: string, init?: RequestInit) {
+  static async fetch<Data = unknown>(pathname: string, init?: RequestInit): Promise<ApiResponse<Data>> {
     let status, statusText, data;
 
     try {
@@ -28,9 +28,12 @@ export default class ApiService {
     return { status, statusText, data };
   }
 
-  static post(pathname: string, body?: any) {
-    return ApiService.fetch(pathname, {
+  static post<Data = unknown>(pathname: string, body?: any): Promise<ApiResponse<Data>> {
+    return ApiService.fetch<Data>(pathname, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: body ? JSON.stringify(body) : undefined,
     });
   }
