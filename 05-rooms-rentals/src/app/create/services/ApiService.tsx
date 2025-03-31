@@ -1,4 +1,4 @@
-import {API_URL} from '@/config';
+import { API_URL } from '@/config';
 
 export type ApiResponse<Data = unknown> = {
   statusText: string;
@@ -17,17 +17,21 @@ export default class ApiService {
       status = response.status;
       statusText = response.statusText;
       data = await response.json().catch(() => undefined);
-    } catch (error) {
-      statusText = error.message;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        statusText = error.message; 
+      } else {
+        statusText = 'Unknown error occurred'; 
+      }
     }
 
-    return {status, statusText, data};
+    return { status, statusText, data };
   }
 
   static post(pathname: string, body?: any) {
     return ApiService.fetch(pathname, {
       method: 'POST',
-      body: body ? JSON.stringify(body) : undefined
+      body: body ? JSON.stringify(body) : undefined,
     });
   }
 }

@@ -1,5 +1,5 @@
-import { Room } from '@/types';
-import RoomCard from './RoomCard';
+import type { Room } from "@/types"
+import RoomCard from "./RoomCard"
 
 export default function RoomGrid({ rooms }: { rooms: Room[] }) {
   return (
@@ -8,5 +8,6 @@ export default function RoomGrid({ rooms }: { rooms: Room[] }) {
         <RoomCard key={room.id} room={room} />
       ))}
     </div>
-  );
+  )
 }
+

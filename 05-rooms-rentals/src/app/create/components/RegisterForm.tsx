@@ -2,7 +2,7 @@
 import { ApiResponse } from "../services/ApiService";
 import FormItems from "./FormItems";
 import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
+import { useFormStatus } from 'react-dom';
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -31,19 +31,26 @@ export default function RegisterForm({ action }: Props) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
 
-  const handleSubmit = (formData: FormData) => {
+  
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+  
+    const formData = new FormData(event.target as HTMLFormElement);
     const newErrors: Record<string, string> = {};
+  
     if (!formData.get("title")) newErrors.title = "Title is required";
     if (!formData.get("description")) newErrors.description = "Description is required";
     if (!formData.get("heroUrl")) newErrors.heroUrl = "Image URL is required";
     if (!formData.get("price")) newErrors.price = "Price is required";
     
-    setErrors(newErrors);
-    
+    setErrors(newErrors); // Setzt Fehler für die Anzeige
+  
     if (Object.keys(newErrors).length === 0) {
-      formAction(formData);
+      await formAction(formData);
     }
   };
+  
+  
 
   useEffect(() => {
     if (state?.status === 201) {
@@ -52,7 +59,7 @@ export default function RegisterForm({ action }: Props) {
   }, [state, router]);
 
   return (
-    <form action={handleSubmit} className="max-w-md">
+    <form onSubmit={handleSubmit} className="max-w-md">
       <FormItems errors={errors} />
       {state?.status && state.status >= 400 && (
         <p className="text-red-500 mt-2">{state.statusText}</p>

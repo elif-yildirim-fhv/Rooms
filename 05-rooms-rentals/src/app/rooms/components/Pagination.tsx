@@ -1,52 +1,43 @@
-import Link from 'next/link';
+"use client"
+import { useRouter, useSearchParams } from "next/navigation"
 
 export default function Pagination({
   currentPage,
   totalPages,
+  setPage,
   sortKey,
 }: {
-  currentPage: number;
-  totalPages: number;
-  sortKey: string;
+  currentPage: number
+  totalPages: number
+  setPage: (page: number) => void
+  sortKey: string
 }) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const handlePageChange = (page: number) => {
+    setPage(page)
+    
+    // URL aktualisieren
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', page.toString())
+    params.set('sort', sortKey)
+    router.push(`/rooms?${params.toString()}`, { scroll: false })
+  }
+
   return (
-    <div className="flex justify-between items-center mt-8">
-      {/* Previous Button */}
-      {currentPage > 1 ? (
-        <Link
-          href={`/rooms?page=${currentPage - 1}&sort=${sortKey}`}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+    <div className="flex justify-center mt-8 gap-2">
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+        <button
+          key={page}
+          onClick={() => handlePageChange(page)}
+          className={`px-3 py-1 rounded ${
+            currentPage === page ? "bg-blue-500 text-white" : "bg-gray-200"
+          }`}
         >
-          Previous
-        </Link>
-      ) : (
-        <button 
-          disabled 
-          className="px-4 py-2 bg-gray-300 rounded cursor-not-allowed"
-        >
-          Previous
+          {page}
         </button>
-      )}
-
-      <span>
-        Page {currentPage} of {totalPages}
-      </span>
-
-      {currentPage < totalPages ? (
-        <Link
-          href={`/rooms?page=${currentPage + 1}&sort=${sortKey}`}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Next
-        </Link>
-      ) : (
-        <button 
-          disabled 
-          className="px-4 py-2 bg-gray-300 rounded cursor-not-allowed"
-        >
-          Next
-        </button>
-      )}
+      ))}
     </div>
-  );
+  )
 }
