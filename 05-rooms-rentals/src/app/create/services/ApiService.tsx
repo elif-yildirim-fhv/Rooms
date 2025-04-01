@@ -28,7 +28,7 @@ export default class ApiService {
     return { status, statusText, data };
   }
 
-  static post<Data = unknown>(pathname: string, body?: any): Promise<ApiResponse<Data>> {
+  static post<Data = unknown>(pathname: string, body?: unknown): Promise<ApiResponse<Data>> {
     return ApiService.fetch<Data>(pathname, {
       method: 'POST',
       headers: {

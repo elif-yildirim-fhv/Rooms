@@ -1,5 +1,6 @@
 import Link from "next/link"
 import type { Room } from "@/types"
+import { formatDate } from "@/utils/dateUtils"
 
 export default function RoomCard({ room }: { room: Room }) {
   return (
@@ -14,7 +15,7 @@ export default function RoomCard({ room }: { room: Room }) {
       <p className="text-gray-600 line-clamp-2 my-2">{room.description}</p>
 
       <div className="flex justify-between mt-4">
-        <span className="text-sm">{new Date(room.createdAt).toLocaleDateString()}</span>
+        <span className="text-sm">{formatDate(room.createdAt)}</span>
         <span className="font-bold">${room.pricePerNight.amount}/night</span>
       </div>
 

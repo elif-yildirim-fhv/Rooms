@@ -14,7 +14,7 @@ export default function SortControls({ currentSort }: SortControlsProps) {
     const params = new URLSearchParams(searchParams.toString())
     
     params.set('sort', newSort)
-    params.set('page', '1') // Reset to first page on sort change
+    params.set('page', '1') 
     router.push(`/rooms?${params.toString()}`, { scroll: false })
   }
 

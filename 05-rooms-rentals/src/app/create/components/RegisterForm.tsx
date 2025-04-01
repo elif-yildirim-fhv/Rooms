@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation"
 import type { ApiResponse } from "../services/ApiService"
 import FormItems from "./FormItems";
 
-
 type Props<T = unknown> = {
   action: (prevState: ApiResponse<T> | undefined, formData: FormData) => Promise<ApiResponse<T>>
 }
@@ -46,8 +45,8 @@ export default function RegisterForm<T = unknown>({ action }: Props<T>) {
 
   return (
     <form action={formAction} className="max-w-md">
-      <FormItems errors={errorMessages as Record<string, string>} />
-      {state?.status && state.status >= 400 && (
+      <FormItems errors={errorMessages} />
+      {state?.status && state.status >= 400 && !errorMessages.title && !errorMessages.description && !errorMessages.heroUrl && !errorMessages.price && (
         <p className="text-red-500 mt-2">{state.statusText}</p>
       )}
       <SubmitButton />

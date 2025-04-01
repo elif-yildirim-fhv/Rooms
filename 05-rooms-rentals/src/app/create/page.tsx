@@ -2,7 +2,6 @@ import RegisterForm from "./components/RegisterForm"
 import ApiService from "./services/ApiService"
 import type { Room, RoomInput } from "@/types"
 import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
 import type { Metadata } from "next"
 import { API_URL } from "@/config"
 import type { ApiResponse } from "./services/ApiService" 
@@ -29,7 +28,7 @@ async function onSubmit(prevState: ApiResponse<Room> | undefined, formData: Form
       if (!url.hostname.includes("pxhere.com")) {
         return { status: 400, statusText: "Image URL must be from pxhere.com", data: undefined }
       }
-    } catch (e) {
+    } catch {
       return { status: 400, statusText: "Invalid URL format", data: undefined }
     }
 
@@ -55,4 +54,13 @@ async function onSubmit(prevState: ApiResponse<Room> | undefined, formData: Form
     console.error("Error creating room:", error);
     return { status: 500, statusText: "An error occurred", data: undefined };
   }
+}
+
+export default function CreateCabinPage() {
+  return (
+    <div className="py-8">
+      <h2 className="text-2xl font-bold mb-6">Create New Cabin</h2>
+      <RegisterForm<Room> action={onSubmit} />
+    </div>
+  )
 }

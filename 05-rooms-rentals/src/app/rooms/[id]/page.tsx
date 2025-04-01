@@ -1,44 +1,62 @@
-import { API_URL } from "@/config"
-import type { Room } from "@/types"
-import { notFound } from "next/navigation"
-import type { Metadata } from "next"
+import { API_URL } from "@/config";
+import type { Room } from "@/types";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { formatDate } from "@/utils/dateUtils";
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  let room: Room
+export async function generateMetadata(
+  { params }: { params: { id: string } }
+): Promise<Metadata> {
+  const { id } = await params;
+
+  if (!id) {
+    return { title: "Room Details - Not Found" };
+  }
 
   try {
-    const response = await fetch(`${API_URL}/rooms/${params.id}`)
+    const response = await fetch(`${API_URL}/rooms/${id}`);
+
     if (!response.ok) {
-      return {
-        title: "Room Details - Not Found",
-      }
+      return { title: "Room Details - Not Found" };
     }
-    room = await response.json()
+
+    const room: Room = await response.json();
     return {
       title: `${room.title} - Room Details`,
       description: room.description,
-    }
-  } catch (error) {
-    return {
-      title: "Room Details - Error",
-    }
+    };
+  } catch {
+    return { title: "Room Details - Not Found" };
   }
 }
 
 export default async function RoomDetail({ params }: { params: { id: string } }) {
-  let room: Room
+  // Ensure `params` is awaited
+  const { id } = await params;
 
-  try {
-    const response = await fetch(`${API_URL}/rooms/${params.id}`)
-    if (!response.ok) {
-      notFound()
-    }
-    room = await response.json()
-  } catch (e) {
-    notFound()
+  if (!id) {
+    notFound();
   }
 
-  const formattedDate = new Date(room.createdAt).toLocaleDateString()
+  let room: Room | null = null;
+
+  try {
+    const response = await fetch(`${API_URL}/rooms/${id}`);
+
+    if (!response.ok) {
+      notFound();
+    }
+
+    room = await response.json();
+  } catch {
+    notFound();
+  }
+
+  if (!room) {
+    notFound();
+  }
+
+  const formattedDate = formatDate(room.createdAt);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -68,6 +86,5 @@ export default async function RoomDetail({ params }: { params: { id: string } })
         </div>
       </div>
     </div>
-  )
+  );
 }
-

@@ -3,7 +3,12 @@ import { useFormStatus } from "react-dom"
 import Input from "./Input"
 
 interface FormItemsProps {
-  errors?: Record<string, string>
+  errors?: {
+    title?: string;
+    description?: string;
+    heroUrl?: string;
+    price?: string;
+  };
 }
 
 export default function FormItems({ errors = {} }: FormItemsProps) {
@@ -24,6 +29,7 @@ export default function FormItems({ errors = {} }: FormItemsProps) {
         />
         {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
       </div>
+
       <div>
         <label htmlFor="description" className="block">
           Description
